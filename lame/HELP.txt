@@ -1,0 +1,11 @@
+- Extract lame-3.99.2.tar.gz
+- Navigate to lame-3.99.2
+- Configure the library by running ./configure 
+
+  eg. $ ./configure --prefix=<your-install-dir-here>
+
+- make
+- make install
+
+
+(While running your app, ensure that LD_LIBRARY_PATH is correctly set to load the dependencies (eg. lame libs etc...))

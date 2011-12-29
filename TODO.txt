@@ -1,0 +1,2 @@
+- Add Qt frontend GUI to the console application.
+
