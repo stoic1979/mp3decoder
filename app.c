@@ -27,7 +27,6 @@ static int unpack_read_samples(const int samples_to_read, const int bytes_per_sa
 int WriteWaveHeader(FILE * const fp, int pcmbytes, int freq, int channels, int bits);
 static int read_samples_mp3(lame_t gfp, FILE * musicin, short int mpg123pcm[2][1152]);
 static int read_samples_pcm(FILE * musicin, int sample_buffer[2304], int samples_to_read);
-DecoderProgress decoder_progress_init(unsigned long n, int framesize);
 int samples_to_skip_at_start(void);
 int samples_to_skip_at_end(void);
 char* lame_getenv(char const* var);
@@ -1472,28 +1471,6 @@ static int takePcmBuffer(PcmBuffer * b, void *a0, void *a1, int a_n, int mm) {
     return a_n;
 }
 
-
-DecoderProgress decoder_progress_init(unsigned long n, int framesize) {
-    DecoderProgress dp = &global_decoder_progress;
-    dp->last_mode_ext =0;
-    dp->frames_total = 0;
-    dp->frame_ctr = 0;
-    dp->framesize = framesize;
-    dp->samples = 0;
-    if (n != (0ul-1ul)) {
-        if (framesize == 576 || framesize == 1152) {
-            dp->frames_total = calcNumBlocks(n, framesize);
-            dp->samples = 576 + calcEndPadding(n, framesize);
-        }
-        else if (framesize > 0) {
-            dp->frames_total = n / framesize;
-        }
-        else {
-            dp->frames_total = n;
-        }
-    }
-    return dp;
-}
 
 static int lame_decoder(lame_t gfp, FILE * outf, char *inPath, char *outPath) {
     short int Buffer[2][1152];
