@@ -25,7 +25,6 @@ static int takePcmBuffer(PcmBuffer * b, void *a0, void *a1, int a_n, int mm);
 static int addPcmBuffer(PcmBuffer * b, void *a0, void *a1, int read);
 static int unpack_read_samples(const int samples_to_read, const int bytes_per_sample, const int swap_order, int *sample_buffer, FILE * pcm_in);
 int WriteWaveHeader(FILE * const fp, int pcmbytes, int freq, int channels, int bits);
-void decoder_progress_finish(DecoderProgress dp);
 static int read_samples_mp3(lame_t gfp, FILE * musicin, short int mpg123pcm[2][1152]);
 static int read_samples_pcm(FILE * musicin, int sample_buffer[2304], int samples_to_read);
 DecoderProgress decoder_progress_init(unsigned long n, int framesize);
@@ -1547,8 +1546,6 @@ static int lame_decoder(lame_t gfp, FILE * outf, char *inPath, char *outPath) {
     fclose(outf);
     close_infile();
 
-    if (dp != 0)
-        decoder_progress_finish(dp);
     return 0;
 }
 
@@ -1705,12 +1702,6 @@ void put_audio16(FILE * outf, short Buffer[2][1152], int iread, int nch) {
     if (global_writer.flush_write == 1) {
         fflush(outf);
     }
-}
-
-
-void decoder_progress_finish(DecoderProgress dp) {
-    //(void) dp;
-    //console_printf("\n");
 }
 
 #if defined(HAVE_MPGLIB)
