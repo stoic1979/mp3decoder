@@ -19,19 +19,6 @@
 typedef float ieee754_float32_t;
 #endif
 
-struct DecoderProgress;
-typedef struct DecoderProgress* DecoderProgress;
-
-/* these functions are used in get_audio.c */
-static struct DecoderProgress {
-    int     last_mode_ext;
-    int     frames_total;
-    int     frame_ctr;
-    int     framesize;
-    unsigned long samples;
-} global_decoder_progress;
-
-
 typedef struct blockAlign_struct {
     unsigned long offset;
     unsigned long blockSize;

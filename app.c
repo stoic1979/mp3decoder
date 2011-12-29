@@ -1479,7 +1479,6 @@ static int lame_decoder(lame_t gfp, FILE * outf, char *inPath, char *outPath) {
     int     tmp_num_channels = lame_get_num_channels(gfp);
     int     skip_start = samples_to_skip_at_start();
     int     skip_end = samples_to_skip_at_end();
-    DecoderProgress dp = 0;
 
     if (!(tmp_num_channels >= 1 && tmp_num_channels <= 2)) {
         printf("Internal error.  Aborting.");
