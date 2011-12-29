@@ -2,7 +2,6 @@
 # include <string.h>
 #include <stdlib.h>
 #include "lame.h"
-#include "app_defs.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -10,53 +9,9 @@
 #include <wchar.h>
 //#include <mbstring.h>
 
-
-//PROTOTYPES -------------------------------------------------------------------------------------
-static int lame_decode_fromfile(FILE * fd, short pcm_l[], short pcm_r[], mp3data_struct * mp3data);
-void close_infile(void);
-static unsigned long calcNumBlocks(unsigned long samples, int pcm_samples_per_frame);
-void put_audio16(FILE * outf, short Buffer[2][1152], int iread, int nch);
-static unsigned long calcEndPadding(unsigned long samples, int pcm_samples_per_frame);
-static void write_16_bits_low_high(FILE * fp, int val);
-static void write_32_bits_low_high(FILE * fp, int val);
-int get_audio16(lame_t gfp, short buffer[2][1152]);
-static int get_audio_common(lame_t gfp, int buffer[2][1152], short buffer16[2][1152]);
-static int takePcmBuffer(PcmBuffer * b, void *a0, void *a1, int a_n, int mm);
-static int addPcmBuffer(PcmBuffer * b, void *a0, void *a1, int read);
-static int unpack_read_samples(const int samples_to_read, const int bytes_per_sample, const int swap_order, int *sample_buffer, FILE * pcm_in);
-int WriteWaveHeader(FILE * const fp, int pcmbytes, int freq, int channels, int bits);
-static int read_samples_mp3(lame_t gfp, FILE * musicin, short int mpg123pcm[2][1152]);
-static int read_samples_pcm(FILE * musicin, int sample_buffer[2304], int samples_to_read);
-int samples_to_skip_at_start(void);
-int samples_to_skip_at_end(void);
-char* lame_getenv(char const* var);
-static FILE* init_files(lame_global_flags * gf, char const *inPath, char const *outPath);
-int          init_infile(lame_t gfp, char const *inPath);
-FILE*        init_outfile(char const *outPath, int decode);
-int          is_mpeg_file_format(int input_file_format);
-static FILE* open_mpeg_file(lame_t gfp, char const *inPath, int *enc_delay, int *enc_padding);
-static FILE* open_wave_file(lame_t gfp, char const *inPath);
-static int   close_input_file(FILE * musicin);
-static void  freePcmBuffer(PcmBuffer * b);
-static void  initPcmBuffer(PcmBuffer * b, int w);
-static off_t lame_get_file_size(FILE * fp);
-int          lame_set_stream_binary_mode(FILE * const fp);
-static int parse_file_header(lame_global_flags * gfp, FILE * sf);
-static void setSkipStartAndEnd(lame_t gfp, int enc_delay, int enc_padding);
-static int parse_wave_header(lame_global_flags * gfp, FILE * sf);
-static long make_even_number_of_bytes_in_length(long x);
-static int parse_aiff_header(lame_global_flags * gfp, FILE * sf);
-static int aiff_check2(IFF_AIFF * const pcm_aiff_data);
-static int read_16_bits_low_high(FILE * fp);
-static int read_32_bits_low_high(FILE * fp);
-static int read_32_bits_high_low(FILE * fp);
-static int read_16_bits_high_low(FILE * fp);
-static double read_ieee_extended_high_low(FILE * fp);
-static int fskip(FILE * fp, long offset, int whence);
-static  size_t min_size_t(size_t a, size_t b);
-static FILE* lame_fopen(char const* file, char const* mode);
-static int lame_decoder(lame_t gfp, FILE * outf, char *inPath, char *outPath);
-
+#include "app_defs.h"
+#include "utils.h"
+#include "app.h"
 
 //STATIC DATA ------------------------------------------------------------------------------------
 static get_audio_global_data global;
@@ -153,9 +108,7 @@ else fallback to old code
         }
     }
 #endif
-    if (0 == fseek(fp, offset, whence)) {
-        return 0;
-    }
+    if (0 == fseek(fp, offset, whence)) { return 0; }
 
     if (whence != SEEK_CUR || offset < 0) {
         if (global_ui_config.silent < 10) {
@@ -214,37 +167,6 @@ static double read_ieee_extended_high_low(FILE * fp) {
     }
 }
 
-static int read_16_bits_high_low(FILE * fp) {
-    unsigned char bytes[2] = { 0, 0 };
-    fread(bytes, 1, 2, fp);
-    {
-        int32_t const low = bytes[1];
-        int32_t const high = (signed char) (bytes[0]);
-        return (high << 8) | low;
-    }
-}
-static int read_32_bits_high_low(FILE * fp) {
-    unsigned char bytes[4] = { 0, 0, 0, 0 };
-    fread(bytes, 1, 4, fp);
-    {
-        int32_t const low = bytes[3];
-        int32_t const medl = bytes[2];
-        int32_t const medh = bytes[1];
-        int32_t const high = (signed char) (bytes[0]);
-        return (high << 24) | (medh << 16) | (medl << 8) | low;
-    }
-}
-static int read_32_bits_low_high(FILE * fp) {
-    unsigned char bytes[4] = { 0, 0, 0, 0 };
-    fread(bytes, 1, 4, fp);
-    {
-        int32_t const low = bytes[0];
-        int32_t const medl = bytes[1];
-        int32_t const medh = bytes[2];
-        int32_t const high = (signed char) (bytes[3]);
-        return (high << 24) | (medh << 16) | (medl << 8) | low;
-    }
-}
 static long make_even_number_of_bytes_in_length(long x) {
     if ((x & 0x01) != 0) {
         return x + 1;
@@ -252,15 +174,6 @@ static long make_even_number_of_bytes_in_length(long x) {
     return x;
 }
 
-static int read_16_bits_low_high(FILE * fp) {
-    unsigned char bytes[2] = { 0, 0 };
-    fread(bytes, 1, 2, fp);
-    {
-        int32_t const low = bytes[0];
-        int32_t const high = (signed char) (bytes[1]);
-        return (high << 8) | low;
-    }
-}
 
 /************************************************************************
 * aiff_check2
@@ -268,7 +181,6 @@ static int read_16_bits_low_high(FILE * fp) {
 * PURPOSE:	Checks AIFF header information to make sure it is valid.
 *	        returns 0 on success, 1 on errors
 ************************************************************************/
-
 static int aiff_check2(IFF_AIFF * const pcm_aiff_data) {
     if (pcm_aiff_data->sampleType != (unsigned long) IFF_ID_SSND) {
         if (global_ui_config.silent < 10) {
@@ -317,7 +229,6 @@ static int aiff_check2(IFF_AIFF * const pcm_aiff_data) {
  *	read, and we're pretty sure that we're looking at an AIFF file.
  *
  *****************************************************************************/
-
 static int parse_aiff_header(lame_global_flags * gfp, FILE * sf) {
     long    chunkSize = 0, subSize = 0, typeID = 0, dataType = IFF_ID_NONE;
     IFF_AIFF aiff_info;
@@ -673,7 +584,7 @@ static int parse_file_header(lame_global_flags * gfp, FILE * sf) {
     return sf_unknown;
 }
 
-int lame_set_stream_binary_mode(FILE * const fp) {
+static int lame_set_stream_binary_mode(FILE * const fp) {
 #if   defined __EMX__
     _fsetmode(fp, "b");
 #elif defined __BORLANDC__
@@ -722,7 +633,7 @@ FILE* lame_fopen(char const* file, char const* mode) {
     free(wmode);
     return fh;
 }
-char* lame_getenv(char const* var) {
+static char* lame_getenv(char const* var) {
     char* str = 0;
     wchar_t* wvar = utf8ToUnicode(var);
     wchar_t* wstr = 0;
@@ -736,7 +647,7 @@ char* lame_getenv(char const* var) {
 }
 
 #else
-char* lame_getenv(char const* var) {
+static char* lame_getenv(char const* var) {
     char* str = getenv(var);
     if (str) {
         return strdup(str);
@@ -1038,10 +949,10 @@ static FILE* init_files(lame_global_flags * gf, char const *inPath, char const *
 
     return outf;
 }
-int samples_to_skip_at_start(void) {
+static int samples_to_skip_at_start(void) {
     return global.pcm32.skip_start;
 }
-int samples_to_skip_at_end(void) {
+static int samples_to_skip_at_end(void) {
     return global.pcm32.skip_end;
 }
 
@@ -1142,7 +1053,7 @@ static int read_samples_mp3(lame_t gfp, FILE * musicin, short int mpg123pcm[2][1
 }
 
 
-int WriteWaveHeader(FILE * const fp, int pcmbytes, int freq, int channels, int bits) {
+static int WriteWaveHeader(FILE * const fp, int pcmbytes, int freq, int channels, int bits) {
     int     bytes = (bits + 7) / 8;
 
     if(fp == NULL) {
@@ -1165,21 +1076,6 @@ int WriteWaveHeader(FILE * const fp, int pcmbytes, int freq, int channels, int b
     return ferror(fp) ? -1 : 0;
 }
 
-static void write_16_bits_low_high(FILE * fp, int val) {
-    unsigned char bytes[2];
-    bytes[0] = (val & 0xff);
-    bytes[1] = ((val >> 8) & 0xff);
-    fwrite(bytes, 1, 2, fp);
-}
-
-static void write_32_bits_low_high(FILE * fp, int val) {
-    unsigned char bytes[4];
-    bytes[0] = (val & 0xff);
-    bytes[1] = ((val >> 8) & 0xff);
-    bytes[2] = ((val >> 16) & 0xff);
-    bytes[3] = ((val >> 24) & 0xff);
-    fwrite(bytes, 1, 4, fp);
-}
 
 static unsigned long calcEndPadding(unsigned long samples, int pcm_samples_per_frame) {
     unsigned long end_padding;
@@ -1480,7 +1376,7 @@ static int lame_decoder(lame_t gfp, FILE * outf, char *inPath, char *outPath) {
     return 0;
 }
 
-void close_infile(void) {
+static void close_infile(void) {
     close_input_file(global.music_in);
 #ifdef LIBSNDFILE
     if (global.snd_file) {
@@ -1581,7 +1477,7 @@ unpack_read_samples(const int samples_to_read, const int bytes_per_sample,
 }
 
 
-void put_audio16(FILE * outf, short Buffer[2][1152], int iread, int nch) {
+static void put_audio16(FILE * outf, short Buffer[2][1152], int iread, int nch) {
     char    data[2 * 1152 * 2];
     int     i, m = 0;
 
@@ -1648,9 +1544,7 @@ check_aid(const unsigned char *header)
  * data stream
  */
 
-static int
-is_syncword_mp123(const void *const headerptr)
-{
+static int is_syncword_mp123(const void *const headerptr) {
     const unsigned char *const p = headerptr;
     static const char abl2[16] = { 0, 7, 7, 7, 0, 7, 0, 0, 0, 0, 0, 8, 8, 8, 8, 8 };
 
