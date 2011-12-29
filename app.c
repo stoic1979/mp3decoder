@@ -25,7 +25,6 @@ static int takePcmBuffer(PcmBuffer * b, void *a0, void *a1, int a_n, int mm);
 static int addPcmBuffer(PcmBuffer * b, void *a0, void *a1, int read);
 static int unpack_read_samples(const int samples_to_read, const int bytes_per_sample, const int swap_order, int *sample_buffer, FILE * pcm_in);
 int WriteWaveHeader(FILE * const fp, int pcmbytes, int freq, int channels, int bits);
-void decoder_progress(DecoderProgress dp, const mp3data_struct * mp3data, int iread);
 void decoder_progress_finish(DecoderProgress dp);
 static int read_samples_mp3(lame_t gfp, FILE * musicin, short int mpg123pcm[2][1152]);
 static int read_samples_pcm(FILE * musicin, int sample_buffer[2304], int samples_to_read);
@@ -1521,9 +1520,6 @@ static int lame_decoder(lame_t gfp, FILE * outf, char *inPath, char *outPath) {
         iread = get_audio16(gfp, Buffer); /* read in 'iread' samples */
         if (iread >= 0) {
             wavsize += iread;
-            if (dp != 0) {
-                decoder_progress(dp, &global_decoder.mp3input_data, iread);
-            }
             put_audio16(outf, Buffer, iread, tmp_num_channels);
         }
     } while (iread > 0);
@@ -1654,38 +1650,6 @@ unpack_read_samples(const int samples_to_read, const int bytes_per_sample,
         }
     }
     return (samples_read);
-}
-
-
-void decoder_progress(DecoderProgress dp, const mp3data_struct * mp3data, int iread) {
-/*
-    addSamples(dp, iread);
-
-    console_printf("\rFrame#%6i/%-6i %3i kbps",
-                   dp->frame_ctr, dp->frames_total, mp3data->bitrate);
-
-    // Programmed with a single frame hold delay 
-    // Attention: static data 
-
-    // MP2 Playback is still buggy. 
-    // "'00' subbands 4-31 in intensity_stereo, bound==4" 
-    // is this really intensity_stereo or is it MS stereo? 
-
-    if (mp3data->mode == JOINT_STEREO) {
-        int     curr = mp3data->mode_ext;
-        int     last = dp->last_mode_ext;
-        console_printf("  %s  %c",
-                       curr & 2 ? last & 2 ? " MS " : "LMSR" : last & 2 ? "LMSR" : "L  R",
-                       curr & 1 ? last & 1 ? 'I' : 'i' : last & 1 ? 'i' : ' ');
-        dp->last_mode_ext = curr;
-    }
-    else {
-        console_printf("         ");
-        dp->last_mode_ext = 0;
-    }
-    console_printf("        \b\b\b\b\b\b\b\b");
-    console_flush();
-*/
 }
 
 
