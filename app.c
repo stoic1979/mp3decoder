@@ -1511,40 +1511,6 @@ static int lame_decoder(lame_t gfp, FILE * outf, char *inPath, char *outPath) {
         exit(-1);
     }
 
-    if (global_ui_config.silent < 9) {
-        /*
-        console_printf("\rinput:  %s%s(%g kHz, %i channel%s, ",
-                       strcmp(inPath, "-") ? inPath : "<stdin>",
-                       strlen(inPath) > 26 ? "\n\t" : "  ",
-                       lame_get_in_samplerate(gfp) / 1.e3,
-                       tmp_num_channels, tmp_num_channels != 1 ? "s" : "");
-        printInputFormat(gfp);
-
-        console_printf(")\noutput: %s%s(16 bit, Microsoft WAVE)\n",
-                       strcmp(outPath, "-") ? outPath : "<stdout>",
-                       strlen(outPath) > 45 ? "\n\t" : "  ");
-
-        if (skip_start > 0) console_printf("skipping initial %i samples (encoder+decoder delay)\n", skip_start);
-        if (skip_end > 0) console_printf("skipping final %i samples (encoder padding-decoder delay)\n", skip_end);
-         */
-
-        switch (global_reader.input_format) {
-        case sf_mp3:
-        case sf_mp2:
-        case sf_mp1:
-            dp = decoder_progress_init(lame_get_num_samples(gfp),
-                                       global_decoder.mp3input_data.framesize);
-            break;
-        case sf_raw:
-        case sf_wave:
-        case sf_aiff:
-        default:
-            dp = decoder_progress_init(lame_get_num_samples(gfp),
-                                       lame_get_in_samplerate(gfp) < 32000 ? 576 : 1152);
-            break;
-        }
-    }
-
     if (0 == global_decoder.disable_wav_header) {
         WriteWaveHeader(outf, 0x7FFFFFFF, lame_get_in_samplerate(gfp), tmp_num_channels, 16);
     }
