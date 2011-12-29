@@ -1038,50 +1038,6 @@ static FILE* init_files(lame_global_flags * gf, char const *inPath, char const *
 
     return outf;
 }
-int lame_main(lame_t gf, int argc, char **argv) {
-    char    inPath[PATH_MAX + 1];
-    char    outPath[PATH_MAX + 1];
-    char    nogapdir[PATH_MAX + 1];
-    /* support for "nogap" encoding of up to 200 .wav files */
-#define MAX_NOGAP 200
-    int     nogapout = 0;
-    int     max_nogap = MAX_NOGAP;
-    char    nogap_inPath_[MAX_NOGAP][PATH_MAX + 1];
-    char   *nogap_inPath[MAX_NOGAP];
-
-    int     ret;
-    int     i;
-    FILE   *outf;
-
-
-    global_reader.input_format = sf_mp3;
-    outf = init_files(gf, argv[1], argv[2]);
-    if (outf == NULL) {
-        return -1;
-    }
-    /* turn off automatic writing of ID3 tag data into mp3 stream 
-     * we have to call it before 'lame_init_params', because that
-     * function would spit out ID3v2 tag data.
-     */
-    lame_set_write_id3tag_automatic(gf, 0);
-
-    /* Now that all the options are set, lame needs to analyze them and
-     * set some more internal options and check for problems
-     */
-    ret = lame_init_params(gf);
-    if (ret < 0) {
-        printf("[ERROR]:: fatal error during initialization\n");
-        return ret;
-    }
-
-    if (global_ui_config.silent > 0) {
-        global_ui_config.brhist = 0; /* turn off VBR histogram */
-    }
-
-    /* decode an mp3 file to a .wav */
-    ret = lame_decoder(gf, outf, inPath, outPath);
-    return ret;
-}
 int samples_to_skip_at_start(void) {
     return global.pcm32.skip_start;
 }
@@ -1488,7 +1444,6 @@ static int lame_decoder(lame_t gfp, FILE * outf, char *inPath, char *outPath) {
     if (0 == global_decoder.disable_wav_header) {
         WriteWaveHeader(outf, 0x7FFFFFFF, lame_get_in_samplerate(gfp), tmp_num_channels, 16);
     }
-    /* unknown size, so write maximum 32 bit signed value */
 
     wavsize = 0;
     do {
@@ -1804,7 +1759,6 @@ lame_decode_initfile(FILE * fd, mp3data_struct * mp3data, int *enc_delay, int *e
         if (fread(&buf, 1, 2, fd) != 2)
             return -1;  /* failed */
         aid_header = (unsigned char) buf[0] + 256 * (unsigned char) buf[1];
-        //if (global_ui_config.silent < 9) { console_printf("Album ID found.  length=%i \n", aid_header); }
         /* skip rest of AID, except for 6 bytes we have already read */
         fskip(fd, aid_header - 6, SEEK_CUR);
 
@@ -1822,7 +1776,6 @@ lame_decode_initfile(FILE * fd, mp3data_struct * mp3data, int *enc_delay, int *e
     }
 
     if ((buf[2] & 0xf0) == 0) {
-        //if (global_ui_config.silent < 9) { console_printf("Input file is freeformat.\n"); }
         freeformat = 1;
     }
     /* now parse the current buffer looking for MP3 headers.    */
@@ -1839,18 +1792,14 @@ lame_decode_initfile(FILE * fd, mp3data_struct * mp3data, int *enc_delay, int *e
     /* repeat until we decode a valid mp3 header.  */
     while (!mp3data->header_parsed) {
         len = fread(buf, 1, sizeof(buf), fd);
-        if (len != sizeof(buf))
-            return -1;
-        ret =
-            hip_decode1_headersB(global.hip, buf, len, pcm_l, pcm_r, mp3data, enc_delay,
-                                 enc_padding);
-        if (-1 == ret)
-            return -1;
+        if (len != sizeof(buf)) return -1;
+        ret = hip_decode1_headersB(global.hip, buf, len, pcm_l, pcm_r, mp3data, enc_delay, enc_padding);
+        if (-1 == ret) return -1;
     }
 
     if (mp3data->bitrate == 0 && !freeformat) {
         if (global_ui_config.silent < 10) {
-            printf("fail to sync...\n");
+            printf("[WARNING] :: fail to sync...\n");
         }
         return lame_decode_initfile(fd, mp3data, enc_delay, enc_padding);
     }
@@ -1863,18 +1812,6 @@ lame_decode_initfile(FILE * fd, mp3data_struct * mp3data, int *enc_delay, int *e
          * ant bitrate */
         mp3data->nsamp = MAX_U_32_NUM;
     }
-
-
-    /*
-       report_printf("ret = %i NEED_MORE=%i \n",ret,MP3_NEED_MORE);
-       report_printf("stereo = %i \n",mp.fr.stereo);
-       report_printf("samp = %i  \n",freqs[mp.fr.sampling_frequency]);
-       report_printf("framesize = %i  \n",framesize);
-       report_printf("bitrate = %i  \n",mp3data->bitrate);
-       report_printf("num frames = %ui  \n",num_frames);
-       report_printf("num samp = %ui  \n",mp3data->nsamp);
-       report_printf("mode     = %i  \n",mp.fr.mode);
-     */
 
     return 0;
 }
@@ -1931,6 +1868,8 @@ static int lame_decode_fromfile(FILE * fd, short pcm_l[], short pcm_r[], mp3data
 int main(int argc, char *argv[]) {
     lame_t  gf;
     int     ret=0;
+    char    inPath[PATH_MAX + 1];
+    char    outPath[PATH_MAX + 1];
     FILE   *outf;
 
     gf = lame_init(); /* initialize libmp3lame */
@@ -1944,7 +1883,38 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
     printf("[INFO] :: Initialized Lame...\n");
-    ret = lame_main(gf, argc, argv);
+
+
+    /*set input format to mp3*/
+    global_reader.input_format = sf_mp3;
+
+    outf = init_files(gf, argv[1], argv[2]);
+    if (outf == NULL) { return -1; }
+
+    /* turn off automatic writing of ID3 tag data into mp3 stream 
+     * we have to call it before 'lame_init_params', because that
+     * function would spit out ID3v2 tag data.
+     */
+    lame_set_write_id3tag_automatic(gf, 0);
+
+    /* Now that all the options are set, lame needs to analyze them and
+     * set some more internal options and check for problems
+     */
+    ret = lame_init_params(gf);
+    if (ret < 0) {
+        printf("[ERROR]:: fatal error during initialization\n");
+        return ret;
+    }
+
+    if (global_ui_config.silent > 0) {
+        global_ui_config.brhist = 0; /* turn off VBR histogram */
+    }
+
+    /*decode an mp3 to wav*/
+    ret = lame_decoder(gf, outf, inPath, outPath);
+
+    /*cleanup*/
     lame_close(gf);
+    printf("Decoding finished !!!\n\n");
     return ret;
 }
