@@ -30,7 +30,6 @@ static int     lame_set_stream_binary_mode(FILE * const fp);
 static int     parse_file_header(lame_global_flags * gfp, FILE * sf);
 static void    setSkipStartAndEnd(lame_t gfp, int enc_delay, int enc_padding);
 static int     parse_wave_header(lame_global_flags * gfp, FILE * sf);
-static long    make_even_number_of_bytes_in_length(long x);
 static int     parse_aiff_header(lame_global_flags * gfp, FILE * sf);
 static int     aiff_check2(IFF_AIFF * const pcm_aiff_data);
 static double  read_ieee_extended_high_low(FILE * fp);

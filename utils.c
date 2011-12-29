@@ -33,6 +33,7 @@ int read_32_bits_high_low(FILE * fp) {
         return (high << 24) | (medh << 16) | (medl << 8) | low;
     }
 }
+
 int read_16_bits_high_low(FILE * fp) {
     unsigned char bytes[2] = { 0, 0 };
     fread(bytes, 1, 2, fp);
@@ -42,6 +43,7 @@ int read_16_bits_high_low(FILE * fp) {
         return (high << 8) | low;
     }
 }
+
 void write_16_bits_low_high(FILE * fp, int val) {
     unsigned char bytes[2];
     bytes[0] = (val & 0xff);
@@ -56,4 +58,19 @@ void write_32_bits_low_high(FILE * fp, int val) {
     bytes[2] = ((val >> 16) & 0xff);
     bytes[3] = ((val >> 24) & 0xff);
     fwrite(bytes, 1, 4, fp);
+}
+
+unsigned int uint32_high_low(unsigned char *bytes) {
+    uint32_t const hh = bytes[0];
+    uint32_t const hl = bytes[1];
+    uint32_t const lh = bytes[2];
+    uint32_t const ll = bytes[3];
+    return (hh << 24) | (hl << 16) | (lh << 8) | ll;
+}
+
+long make_even_number_of_bytes_in_length(long x) {
+    if ((x & 0x01) != 0) {
+        return x + 1;
+    }
+    return x;
 }

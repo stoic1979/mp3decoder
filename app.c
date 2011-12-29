@@ -1,11 +1,5 @@
-#include <stdio.h>
-# include <string.h>
-#include <stdlib.h>
 #include "lame.h"
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
 #include <wchar.h>
 //#include <mbstring.h>
 
@@ -129,13 +123,6 @@ else fallback to old code
     return 0;
 }
 
-static unsigned int uint32_high_low(unsigned char *bytes) {
-    uint32_t const hh = bytes[0];
-    uint32_t const hl = bytes[1];
-    uint32_t const lh = bytes[2];
-    uint32_t const ll = bytes[3];
-    return (hh << 24) | (hl << 16) | (lh << 8) | ll;
-}
 
 static double read_ieee_extended_high_low(FILE * fp) {
     unsigned char bytes[10];
@@ -167,12 +154,6 @@ static double read_ieee_extended_high_low(FILE * fp) {
     }
 }
 
-static long make_even_number_of_bytes_in_length(long x) {
-    if ((x & 0x01) != 0) {
-        return x + 1;
-    }
-    return x;
-}
 
 
 /************************************************************************
