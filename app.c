@@ -1,3 +1,16 @@
+/*
+ * Copyright (c) 2011 onwards by WeaveBytes InfoTech Pvt. Ltd.
+ * 
+ * Please reports bugs at weavebytes@gmail.com
+ * 
+ * This file may be distributed and/or modified under the terms of the 
+ * GNU General Public License version 2 as published by the Free Software 
+ * Foundation. (See COPYING.GPL for details.)
+ * 
+ * This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+ * WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ * 
+ */
 #include "lame.h"
 
 #include <wchar.h>
@@ -1478,6 +1491,7 @@ static void put_audio16(FILE * outf, short Buffer[2][1152], int iread, int nch) 
         }
     }
     if (m > 0) {
+        /*.... writing PCM data into the file...*/
         fwrite(data, 1, m, outf);
     }
     if (global_writer.flush_write == 1) {
