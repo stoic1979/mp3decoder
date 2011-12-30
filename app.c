@@ -154,8 +154,6 @@ static double read_ieee_extended_high_low(FILE * fp) {
     }
 }
 
-
-
 /************************************************************************
 * aiff_check2
 *
@@ -227,9 +225,6 @@ static int parse_aiff_header(lame_global_flags * gfp, FILE * sf) {
         long    ckSize;
         int     type = read_32_bits_high_low(sf);
         chunkSize -= 4;
-
-        /* DEBUGF(
-           "found chunk type %08x '%4.4s'\n", type, (char*)&type); */
 
         /* don't use a switch here to make it easier to use 'break' for SSND */
         if (type == IFF_ID_COMM) {
@@ -330,12 +325,10 @@ static int parse_aiff_header(lame_global_flags * gfp, FILE * sf) {
                 return 0;
             }
         }
-
         return 1;
     }
     return -1;
 }
-
 
 /*****************************************************************************
  *
@@ -345,7 +338,6 @@ static int parse_aiff_header(lame_global_flags * gfp, FILE * sf) {
  *	read, and we're pretty sure that we're looking at a WAV file.
  *
  *****************************************************************************/
-
 static int parse_wave_header(lame_global_flags * gfp, FILE * sf) {
     int     format_tag = 0;
     int     channels = 0;
@@ -353,8 +345,6 @@ static int parse_wave_header(lame_global_flags * gfp, FILE * sf) {
     int     bits_per_sample = 0;
     int     samples_per_sec = 0;
     int     avg_bytes_per_sec = 0;
-
-
     int     is_wav = 0;
     long    data_length = 0, file_length, subSize = 0;
     int     loop_sanity = 0;
@@ -370,8 +360,6 @@ static int parse_wave_header(lame_global_flags * gfp, FILE * sf) {
             subSize = read_32_bits_low_high(sf);
             subSize = make_even_number_of_bytes_in_length(subSize);
             if (subSize < 16) {
-                /*DEBUGF(
-                   "'fmt' chunk too short (only %ld bytes)!", subSize);  */
                 return -1;
             }
 
@@ -397,8 +385,6 @@ static int parse_wave_header(lame_global_flags * gfp, FILE * sf) {
                 format_tag = read_16_bits_low_high(sf);
                 subSize -= 10;
             }
-
-            /* DEBUGF("   skipping %d bytes\n", subSize); */
 
             if (subSize > 0) {
                 if (fskip(sf, (long) subSize, SEEK_CUR) != 0)
@@ -429,7 +415,6 @@ static int parse_wave_header(lame_global_flags * gfp, FILE * sf) {
             }
             return 0;   /* oh no! non-supported format  */
         }
-
 
         /* make sure the header is sane */
         if (-1 == lame_set_num_channels(gfp, channels)) {
@@ -517,13 +502,9 @@ static void setSkipStartAndEnd(lame_t gfp, int enc_delay, int enc_padding) {
 * beginning of the sound data.
 *
 ************************************************************************/
-
 static int parse_file_header(lame_global_flags * gfp, FILE * sf) {
     int     type = read_32_bits_high_low(sf);
-    /*
-       DEBUGF(
-       "First word of input stream: %08x '%4.4s'\n", type, (char*) &type); 
-     */
+
     global. count_samples_carefully = 0;
     global. pcm_is_unsigned_8bit = global_raw_pcm.in_signed == 1 ? 0 : 1;
     /*global_reader.input_format = sf_raw; commented out, because it is better to fail
@@ -711,7 +692,6 @@ static FILE * open_mpeg_file(lame_t gfp, char const *inPath, int *enc_delay, int
     }
 #endif
 #ifdef HAVE_MPGLIB
-    //----------------------------------------------//
     printf("-- HAVE_MPGLIB --\n");
 
     if (-1 == lame_decode_initfile(musicin, &global_decoder.mp3input_data, enc_delay, enc_padding)) {
@@ -829,7 +809,7 @@ int is_mpeg_file_format(int input_file_format) {
 }
 int init_infile(lame_t gfp, char const *inPath) {
     int     enc_delay = 0, enc_padding = 0;
-    /* open the input file */
+
     global. count_samples_carefully = 0;
     global. num_samples_read = 0;
     global. pcmbitwidth = global_raw_pcm.in_bitwidth;
@@ -948,7 +928,6 @@ static int samples_to_skip_at_end(void) {
 * into #sample_buffer[]#.  Returns the number of samples read.
 *
 ************************************************************************/
-
 static int read_samples_pcm(FILE * musicin, int sample_buffer[2304], int samples_to_read) {
     int     samples_read;
     int     bytes_per_sample = global.pcmbitwidth / 8;
@@ -992,8 +971,6 @@ static int read_samples_pcm(FILE * musicin, int sample_buffer[2304], int samples
     return samples_read;
 }
 
-
-
 static int read_samples_mp3(lame_t gfp, FILE * musicin, short int mpg123pcm[2][1152]) {
     int     out;
 #if defined(AMIGA_MPEGA)  ||  defined(HAVE_MPGLIB)
@@ -1033,7 +1010,6 @@ static int read_samples_mp3(lame_t gfp, FILE * musicin, short int mpg123pcm[2][1
     return out;
 }
 
-
 static int WriteWaveHeader(FILE * const fp, int pcmbytes, int freq, int channels, int bits) {
     int     bytes = (bits + 7) / 8;
 
@@ -1056,7 +1032,6 @@ static int WriteWaveHeader(FILE * const fp, int pcmbytes, int freq, int channels
 
     return ferror(fp) ? -1 : 0;
 }
-
 
 static unsigned long calcEndPadding(unsigned long samples, int pcm_samples_per_frame) {
     unsigned long end_padding;
@@ -1121,7 +1096,6 @@ static int get_audio_common(lame_t gfp, int buffer[2][1152], short buffer16[2][1
      * size "framesize".  EXCEPT:  the LAME graphical frame analyzer 
      * will get out of sync if we read more than framesize worth of data.
      */
-
     samples_to_read = framesize = lame_get_framesize(gfp);
     assert(framesize <= 1152);
 
@@ -1303,7 +1277,6 @@ static int takePcmBuffer(PcmBuffer * b, void *a0, void *a1, int a_n, int mm) {
     }
     return a_n;
 }
-
 
 static int lame_decoder(lame_t gfp, FILE * outf, char *inPath, char *outPath) {
     short int Buffer[2][1152];
@@ -1513,18 +1486,13 @@ static void put_audio16(FILE * outf, short Buffer[2][1152], int iread, int nch) 
 }
 
 #if defined(HAVE_MPGLIB)
-static int
-check_aid(const unsigned char *header)
-{
+static int check_aid(const unsigned char *header) {
     return 0 == memcmp(header, "AiD\1", 4);
 }
 
 /*
- * Please check this and don't kill me if there's a bug
- * This is a (nearly?) complete header analysis for a MPEG-1/2/2.5 Layer I, II or III
- * data stream
+ * Complete header analysis for a MPEG-1/2/2.5 Layer I, II or III data stream
  */
-
 static int is_syncword_mp123(const void *const headerptr) {
     const unsigned char *const p = headerptr;
     static const char abl2[16] = { 0, 7, 7, 7, 0, 7, 0, 0, 0, 0, 0, 8, 8, 8, 8, 8 };
@@ -1574,9 +1542,7 @@ static int is_syncword_mp123(const void *const headerptr) {
     return 1;
 }
 
-static size_t
-lenOfId3v2Tag(unsigned char const* buf)
-{
+static size_t lenOfId3v2Tag(unsigned char const* buf) {
     unsigned int b0 = buf[0] & 127;
     unsigned int b1 = buf[1] & 127;
     unsigned int b2 = buf[2] & 127;
@@ -1584,17 +1550,15 @@ lenOfId3v2Tag(unsigned char const* buf)
     return (((((b0 << 7) + b1) << 7) + b2) << 7) + b3;
 }
 
-int
-lame_decode_initfile(FILE * fd, mp3data_struct * mp3data, int *enc_delay, int *enc_padding)
-{
+int lame_decode_initfile(FILE * fd, mp3data_struct * mp3data, int *enc_delay, int *enc_padding) {
     /*  VBRTAGDATA pTagData; */
     /* int xing_header,len2,num_frames; */
-    unsigned char buf[100];
-    int     ret;
-    size_t  len;
-    int     aid_header;
-    short int pcm_l[1152], pcm_r[1152];
-    int     freeformat = 0;
+    unsigned char    buf[100];
+    int              ret;
+    size_t           len;
+    int              aid_header;
+    short int        pcm_l[1152], pcm_r[1152];
+    int              freeformat = 0;
 
 
     memset(mp3data, 0, sizeof(mp3data_struct));
@@ -1687,7 +1651,6 @@ lame_decode_initfile(FILE * fd, mp3data_struct * mp3data, int *enc_delay, int *e
          * ant bitrate */
         mp3data->nsamp = MAX_U_32_NUM;
     }
-
     return 0;
 }
 
@@ -1703,8 +1666,8 @@ For lame_decode1_headers():  return code
    n     number of samples output.  either 576 or 1152 depending on MP3 file.
 */
 static int lame_decode_fromfile(FILE * fd, short pcm_l[], short pcm_r[], mp3data_struct * mp3data) {
-    int     ret = 0;
-    size_t  len = 0;
+    int           ret = 0;
+    size_t        len = 0;
     unsigned char buf[1024];
 
     /* first see if we still have data buffered in the decoder: */
