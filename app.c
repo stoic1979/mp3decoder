@@ -1064,10 +1064,12 @@ static unsigned long calcNumBlocks(unsigned long samples, int pcm_samples_per_fr
     return (samples + end_padding) / pcm_samples_per_frame;
 }
 
-/*
-  get_audio16 - behave as the original get_audio function, with a limited
-                16 bit per sample output
-*/
+/************************************************************************
+*
+*  get_audio16 - behave as the original get_audio function, with a limited
+*                16 bit per sample output
+*
+**********************************************************************************/
 int get_audio16(lame_t gfp, short buffer[2][1152]) {
     int     used = 0, read = 0;
     do {
@@ -1084,14 +1086,14 @@ int get_audio16(lame_t gfp, short buffer[2][1152]) {
 }
 
 /************************************************************************
-  get_audio_common - central functionality of get_audio*
-    in: gfp
-        buffer    output to the int buffer or 16-bit buffer
-   out: buffer    int output    (if buffer != NULL)
-        buffer16  16-bit output (if buffer == NULL) 
-returns: samples read
-note: either buffer or buffer16 must be allocated upon call
-*/
+* get_audio_common - central functionality of get_audio*
+*    in: gfp
+*        buffer    output to the int buffer or 16-bit buffer
+*   out: buffer    int output    (if buffer != NULL)
+*        buffer16  16-bit output (if buffer == NULL) 
+* returns: samples read
+* note: either buffer or buffer16 must be allocated upon call
+**********************************************************************************/
 static int get_audio_common(lame_t gfp, int buffer[2][1152], short buffer16[2][1152]) {
     int     num_channels = lame_get_num_channels(gfp);
     int     insamp[2 * 1152];
@@ -1291,6 +1293,13 @@ static int takePcmBuffer(PcmBuffer * b, void *a0, void *a1, int a_n, int mm) {
     return a_n;
 }
 
+/*********************************************************************************
+*
+* Decode Audio
+* Get PCM Data
+* Write PCM Data Into Output File
+*
+**********************************************************************************/
 static int lame_decoder(lame_t gfp, FILE * outf, char *inPath, char *outPath) {
     short int Buffer[2][1152];
     int     i, iread;
@@ -1363,18 +1372,18 @@ static void close_infile(void) {
     global.in_id3v2_size = 0;
 }
 
-/************************************************************************
-unpack_read_samples - read and unpack signed low-to-high byte or unsigned
-                      single byte input. (used for read_samples function)
-                      Output integers are stored in the native byte order
-                      (little or big endian).  -jd
-  in: samples_to_read
-      bytes_per_sample
-      swap_order    - set for high-to-low byte order input stream
- i/o: pcm_in
- out: sample_buffer  (must be allocated up to samples_to_read upon call)
-returns: number of samples read
-*/
+/*********************************************************************************
+* unpack_read_samples - read and unpack signed low-to-high byte or unsigned
+*                      single byte input. (used for read_samples function)
+*                      Output integers are stored in the native byte order
+*                      (little or big endian).  -jd
+*  in: samples_to_read
+*      bytes_per_sample
+*      swap_order    - set for high-to-low byte order input stream
+* i/o: pcm_in
+* out: sample_buffer  (must be allocated up to samples_to_read upon call)
+* returns: number of samples read
+**********************************************************************************/
 static int
 unpack_read_samples(const int samples_to_read, const int bytes_per_sample,
                     const int swap_order, int *sample_buffer, FILE * pcm_in)
@@ -1444,6 +1453,11 @@ unpack_read_samples(const int samples_to_read, const int bytes_per_sample,
 }
 
 
+/*********************************************************************************
+*
+* Write PCM Buffers Into Output File
+*
+**********************************************************************************/
 static void put_audio16(FILE * outf, short Buffer[2][1152], int iread, int nch) {
     char    data[2 * 1152 * 2];
     int     i, m = 0;
@@ -1504,9 +1518,11 @@ static int check_aid(const unsigned char *header) {
     return 0 == memcmp(header, "AiD\1", 4);
 }
 
-/*
- * Complete header analysis for a MPEG-1/2/2.5 Layer I, II or III data stream
- */
+/*********************************************************************************
+*
+* Complete header analysis for a MPEG-1/2/2.5 Layer I, II or III data stream
+*
+**********************************************************************************/
 static int is_syncword_mp123(const void *const headerptr) {
     const unsigned char *const p = headerptr;
     static const char abl2[16] = { 0, 7, 7, 7, 0, 7, 0, 0, 0, 0, 0, 8, 8, 8, 8, 8 };
@@ -1564,6 +1580,10 @@ static size_t lenOfId3v2Tag(unsigned char const* buf) {
     return (((((b0 << 7) + b1) << 7) + b2) << 7) + b3;
 }
 
+/*********************************************************************************
+*
+*
+**********************************************************************************/
 int lame_decode_initfile(FILE * fd, mp3data_struct * mp3data, int *enc_delay, int *enc_padding) {
     /*  VBRTAGDATA pTagData; */
     /* int xing_header,len2,num_frames; */
@@ -1668,17 +1688,17 @@ int lame_decode_initfile(FILE * fd, mp3data_struct * mp3data, int *enc_delay, in
     return 0;
 }
 
-/*
-For lame_decode_fromfile:  return code
-  -1     error
-   n     number of samples output.  either 576 or 1152 depending on MP3 file.
-
-
-For lame_decode1_headers():  return code
-  -1     error
-   0     ok, but need more data before outputing any samples
-   n     number of samples output.  either 576 or 1152 depending on MP3 file.
-*/
+/*********************************************************************************
+* For lame_decode_fromfile:  return code
+*  -1     error
+*   n     number of samples output.  either 576 or 1152 depending on MP3 file.
+*
+*
+* For lame_decode1_headers():  return code
+*   -1     error
+*    0     ok, but need more data before outputing any samples
+*    n     number of samples output.  either 576 or 1152 depending on MP3 file.
+**********************************************************************************/
 static int lame_decode_fromfile(FILE * fd, short pcm_l[], short pcm_r[], mp3data_struct * mp3data) {
     int           ret = 0;
     size_t        len = 0;
@@ -1717,6 +1737,11 @@ static int lame_decode_fromfile(FILE * fd, short pcm_l[], short pcm_r[], mp3data
 }
 #endif /* defined(HAVE_MPGLIB) */
 
+/*********************************************************************************
+*
+*    MAIN 
+*
+**********************************************************************************/
 int main(int argc, char *argv[]) {
     lame_t  gf;
     int     ret=0;
