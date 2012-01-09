@@ -7,4 +7,8 @@ www.weavebytes.com
 Programmer: Navjot Singh, Navrooh, Surjit, Kulwant Singh
 Email     : weavebytes@gmail.com
 
+NOTE:
+    Humans are smarter than the software, so if you find something wrong in this software,
+    Kindly report it at weavebytes@gmail.com
+
 
