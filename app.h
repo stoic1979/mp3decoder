@@ -55,4 +55,7 @@ static int     lame_decoder(lame_t gfp, FILE * outf, char *inPath, char *outPath
 static unsigned long calcNumBlocks(unsigned long samples, int pcm_samples_per_frame);
 static unsigned long calcEndPadding(unsigned long samples, int pcm_samples_per_frame);
 
+
+void processPCM(char data[2 * 1152 * 2]);
+
 #endif//__APP_H__

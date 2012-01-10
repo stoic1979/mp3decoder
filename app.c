@@ -1507,9 +1507,23 @@ static void put_audio16(FILE * outf, short Buffer[2][1152], int iread, int nch) 
     if (m > 0) {
         /*.... writing PCM data into the file...*/
         fwrite(data, 1, m, outf);
+        processPCM(data);
     }
     if (global_writer.flush_write == 1) {
         fflush(outf);
+    }
+}
+
+void processPCM(char data[2 * 1152 * 2]) {
+    static int firstTime = 0, i;
+    if(firstTime) return;
+    firstTime++;
+
+    while(i<1152) {
+        short pcmLeft  = data[i] << 8 | data[i+1];
+        short pcmRight = data[i+2] << 8 | data[i+3];
+        printf("PCM L,R %d, %d\n", pcmLeft, pcmRight);
+        i+=4;
     }
 }
 
