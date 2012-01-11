@@ -1519,12 +1519,25 @@ void processPCM(char data[2 * 1152 * 2]) {
     if(firstTime) return;
     firstTime++;
 
+    int lmax=0, rmax=0;
+    int lmin=0, rmin=0;
     while(i<1152) {
         short pcmLeft  = data[i] << 8 | data[i+1];
         short pcmRight = data[i+2] << 8 | data[i+3];
         printf("PCM L,R %d, %d\n", pcmLeft, pcmRight);
+        
+        //calculate lmax, lmin
+        if(lmax < pcmLeft) lmax = pcmLeft;
+        if(lmin > pcmLeft) lmin = pcmLeft;
+
+        //calculate rmax, rmin
+        if(rmax < pcmRight) rmax = pcmRight;
+        if(rmin > pcmRight) rmin = pcmRight;
+
         i+=4;
     }
+    printf("LMAX=%d, LMIN=%d\n", lmax, lmin);
+    printf("RMAX=%d, RMIN=%d\n", rmax, rmin);
 }
 
 #if defined(HAVE_MPGLIB)
