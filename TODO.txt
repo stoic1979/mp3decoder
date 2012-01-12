@@ -1,2 +1,6 @@
 - Add Qt frontend GUI to the console application.
 
+- Draw the sine wave graph for the amplitudes.
+
+- Read/Write id3 tags in the mp3 file.
+
