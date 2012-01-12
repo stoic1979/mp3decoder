@@ -1515,8 +1515,11 @@ static void put_audio16(FILE * outf, short Buffer[2][1152], int iread, int nch) 
 }
 
 void processPCM(char data[2 * 1152 * 2]) {
-    static int firstTime = 0, i;
-    if(firstTime) return;
+    static int firstTime = 0;
+    
+    int i=0;
+
+    if(firstTime > 5) return;
     firstTime++;
 
     int lmax=0, rmax=0;
