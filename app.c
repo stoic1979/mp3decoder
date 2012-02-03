@@ -1588,31 +1588,29 @@ void computeFft4Buf(char data[2 * 1152 * 2]) {
     //MinMax(Fft_Buffer, M, min, max);
 
     /*finding excess note*/
-    //weak_note = excessNote(Fft_Buffer, M);
+    excess_note = excessNote(Fft_Buffer, M);
 
     /*finding Phi Rels Cnt*/
-    //phi_rels_cnt = CountPhiRels(Fft_Buffer, M);
+    phi_rels_cnt = CountPhiRels(Fft_Buffer, M);
 
     /*finding Oct Rels Cnt*/
-    //oct_rels_cnt = CountOctRels(Fft_Buffer, M);
+    oct_rels_cnt = CountOctRels(Fft_Buffer, M);
 
     /*finding Fourth Rels Cnt*/
-    //fourth_rels_cnt = CountFourthRels(Fft_Buffer, M);
+    fourth_rels_cnt = CountFourthRels(Fft_Buffer, M);
 
     /*finding Fifth Rels Cnt*/
-    //fifth_rels_cnt = CountFourthRels(Fft_Buffer, M);
+    fifth_rels_cnt = CountFourthRels(Fft_Buffer, M);
 
     printf("------------------ Sound Analysis ----------------\n");
     printf("Jitter          : %f\n", jitter);
     printf("Weak Note       : %f\n", weak_note);
-    //printf("Mix, Max        : %f, %f\n", *min, *max);
-    /*
     printf("Excess Note     : %f\n", weak_note);
     printf("Phi Rels Cnt    : %f\n", phi_rels_cnt);
     printf("Oct Rels Cnt    : %f\n", oct_rels_cnt);
+    //printf("Mix, Max        : %f, %f\n", *min, *max);
     printf("Fourth Rels Cnt : %f\n", fourth_rels_cnt);
     printf("Fifth Rels Cnt  : %f\n", fifth_rels_cnt);
-    */
     printf("--------------------------------------------------\n");
 
 }
