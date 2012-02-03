@@ -57,5 +57,6 @@ static unsigned long calcEndPadding(unsigned long samples, int pcm_samples_per_f
 
 
 void processPCM(char data[2 * 1152 * 2]);
+void computeFft4Buf(char data[2 * 1152 * 2]);
 
 #endif//__APP_H__

@@ -19,6 +19,7 @@
 #include "app_defs.h"
 #include "utils.h"
 #include "app.h"
+#include "fft.h"
 
 //STATIC DATA ------------------------------------------------------------------------------------
 static get_audio_global_data global;
@@ -1508,32 +1509,37 @@ static void put_audio16(FILE * outf, short Buffer[2][1152], int iread, int nch) 
         /*.... writing PCM data into the file...*/
         fwrite(data, 1, m, outf);
         processPCM(data);
+        computeFft4Buf(data);
     }
     if (global_writer.flush_write == 1) {
         fflush(outf);
     }
 }
 
+/*
+* Function to process raw PCM data.
+*/
 void processPCM(char data[2 * 1152 * 2]) {
     static int firstTime = 0;
     
     int i=0;
+    int lmax=0, rmax=0;
+    int lmin=0, rmin=0;
 
     if(firstTime > 5) return;
     firstTime++;
 
-    int lmax=0, rmax=0;
-    int lmin=0, rmin=0;
+
     while(i<1152) {
         short pcmLeft  = data[i] << 8 | data[i+1];
         short pcmRight = data[i+2] << 8 | data[i+3];
         printf("PCM L,R %d, %d\n", pcmLeft, pcmRight);
         
-        //calculate lmax, lmin
+        /*calculate lmax, lmin*/
         if(lmax < pcmLeft) lmax = pcmLeft;
         if(lmin > pcmLeft) lmin = pcmLeft;
 
-        //calculate rmax, rmin
+        /*calculate rmax, rmin*/
         if(rmax < pcmRight) rmax = pcmRight;
         if(rmin > pcmRight) rmin = pcmRight;
 
@@ -1541,6 +1547,74 @@ void processPCM(char data[2 * 1152 * 2]) {
     }
     printf("LMAX=%d, LMIN=%d\n", lmax, lmin);
     printf("RMAX=%d, RMIN=%d\n", rmax, rmin);
+}
+
+void computeFft4Buf(char data[2 * 1152 * 2]) {
+
+    #define BUF_SIZE   2 * 1152 * 2
+
+    double jitter, weak_note, excess_note, *min, *max;
+    double phi_rels_cnt, oct_rels_cnt, fourth_rels_cnt, fifth_rels_cnt;
+    double Fft_Buffer[2 * 1152 * 2];
+    int i;
+    /*
+       fft fn needs double buffer and m,
+       2^m = BUF_SIZE,
+       BUF_SIZE = 2 * 1152 * 2
+       so, m=12, approxmately, need to fix it later
+     */
+    int M = 12;//FIXME
+
+    for(i=0; i<BUF_SIZE; i++) 
+        Fft_Buffer[i] = (double)data[i];
+
+    fft(Fft_Buffer, M);
+
+    /*show the contents of buffer containing fft*/
+    for(i=0; i<BUF_SIZE; i++) 
+        printf("%d %f\n", data[i], Fft_Buffer[i]);
+
+    /* FIXME : need to decide whether to use ,
+       Formants(double *vfft, double *HzFrm, double *PwrFrm, double *phFrm, int n, int &nform)
+       or not ?  */
+
+    /*finding out jitter*/
+    jitter = Jitter(Fft_Buffer, M);
+
+    /*finding weak note*/
+    weak_note = weakNote(Fft_Buffer, M);
+
+    /*min, max*/
+    //MinMax(Fft_Buffer, M, min, max);
+
+    /*finding excess note*/
+    //weak_note = excessNote(Fft_Buffer, M);
+
+    /*finding Phi Rels Cnt*/
+    //phi_rels_cnt = CountPhiRels(Fft_Buffer, M);
+
+    /*finding Oct Rels Cnt*/
+    //oct_rels_cnt = CountOctRels(Fft_Buffer, M);
+
+    /*finding Fourth Rels Cnt*/
+    //fourth_rels_cnt = CountFourthRels(Fft_Buffer, M);
+
+    /*finding Fifth Rels Cnt*/
+    //fifth_rels_cnt = CountFourthRels(Fft_Buffer, M);
+
+    printf("------------------ Sound Analysis ----------------\n");
+    printf("Jitter          : %f\n", jitter);
+    printf("Weak Note       : %f\n", weak_note);
+    //printf("Mix, Max        : %f, %f\n", *min, *max);
+    /*
+    printf("Excess Note     : %f\n", weak_note);
+    printf("Phi Rels Cnt    : %f\n", phi_rels_cnt);
+    printf("Oct Rels Cnt    : %f\n", oct_rels_cnt);
+    printf("Fourth Rels Cnt : %f\n", fourth_rels_cnt);
+    printf("Fifth Rels Cnt  : %f\n", fifth_rels_cnt);
+    */
+    printf("--------------------------------------------------\n");
+
 }
 
 #if defined(HAVE_MPGLIB)
