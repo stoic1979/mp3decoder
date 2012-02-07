@@ -1553,7 +1553,7 @@ void computeFft4Buf(char data[2 * 1152 * 2]) {
 
     #define BUF_SIZE   2 * 1152 * 2
 
-    double jitter, weak_note, excess_note, *min, *max;
+    double jitter, weak_note, excess_note, *min=0, *max=0;
     double phi_rels_cnt, oct_rels_cnt, fourth_rels_cnt, fifth_rels_cnt;
     double Fft_Buffer[2 * 1152 * 2];
     int i;
@@ -1585,7 +1585,7 @@ void computeFft4Buf(char data[2 * 1152 * 2]) {
     weak_note = weakNote(Fft_Buffer, M);
 
     /*min, max*/
-    //MinMax(Fft_Buffer, M, min, max);
+    MinMax(Fft_Buffer, BUF_SIZE, min, max);
 
     /*finding excess note*/
     excess_note = excessNote(Fft_Buffer, M);

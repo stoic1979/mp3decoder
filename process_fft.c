@@ -10,8 +10,7 @@
 //---------------------------------------------------------------------------
 
 // descendant order of power
-static int _sort_pm(const void *p1, const void *p2)
-{
+static int _sort_pm(const void *p1, const void *p2) {
     if ( ((Tpm*)p1)->v > ((Tpm*)p2)->v ) return -1;
     else return +1;
 }
@@ -21,8 +20,7 @@ static int _sort_pm(const void *p1, const void *p2)
 // needs a smooth fft vector.
 //---------------------------------------------------------------------------
 /*
-void Formants2(double *vfft, double *HzFrm, double *PwrFrm, double *phFrm, int n, int *nform)
-{
+void Formants2(double *vfft, double *HzFrm, double *PwrFrm, double *phFrm, int n, int *nform) {
 #define forall(n) for (i=3; i<n; i++)
     Tpm *pm;
     int i;   int p, ip=0;
@@ -135,12 +133,11 @@ void ProcessFFT(
 // ClosestPhiRel. find closest relation to PHI in a series of numbers.
 // 0....... phi ... 1
 //---------------------------------------------------------------------------
-double ClosestPhiRel( double *Frm, int n )
-{
+double ClosestPhiRel( double *Frm, int n ) {
     int i, j;
     double min=1, rel;
     for (i=0; i<n; i++) {
-        for (j=i+1; j<n; j++)  {
+        for (j=i+1; j<n; j++) {
             if (Frm[i]>Frm[j])
                 if (Frm[i]!=0) rel=fabs(Frm[j]/Frm[i] - PHI); else rel=min;
                 else
@@ -159,8 +156,7 @@ double ClosestPhiRel( double *Frm, int n )
 //  HzFrm[0]=0
 // Input comes from adding several fft sound samples
 //------------------------------------------------------------------------------
-int GetPeaks(double *vfft, int nFFT, double *HzFrm, double *PwFrm, int *nform, double*fMax, double*fMin, double fc)
-{
+int GetPeaks(double *vfft, int nFFT, double *HzFrm, double *PwFrm, int *nform, double*fMax, double*fMin, double fc) {
     int i,c, pmax, pmin;
 
     HzFrm[0]=PwFrm[0]=0; // initial value is cero for PHI process
@@ -260,7 +256,7 @@ int CountPhiRels(double *HzFrm, int nform)    {	return CountRels(HzFrm, nform, P
 int CountOctRels(double *HzFrm, int nform)    {	return CountRels(HzFrm, nform, 0.5, DeltaRel); }
 int CountFourthRels(double *HzFrm, int nform) {	return CountRels(HzFrm, nform, 0.75, DeltaRel); }
 int CountFifthRels(double *HzFrm, int nform)  {	return CountRels(HzFrm, nform, 2/3., DeltaRel); }
-double AbsScale1(double *vfft, int n)          {	return AbsScale2(vfft, n, 100.); } // absulute values & scale to
+double AbsScale1(double *vfft, int n)         {	return AbsScale2(vfft, n, 100.); } // absulute values & scale to
 
 double AbsScale2(double *vfft, int n, double scale) {
     double max=-1;
@@ -378,10 +374,8 @@ void SortTwoAsc(double*y, double*x, int n) {
 //
 // tmp code
 //
-int CountPhiRels_ant(double *HzFrm, int nform)
-{
+int CountPhiRels_ant(double *HzFrm, int nform) {
 #define savePhic(i,j,k,r) c++ // i,j,k are in close to PHI relation r~=PHI.
-
 
     int i, j, k;
     int c=0; double r;
@@ -401,8 +395,7 @@ int CountPhiRels_ant(double *HzFrm, int nform)
 //
 // calc jitter from filtered spectrum
 //
-double Jitter(double *vfft, int n)
-{
+double Jitter(double *vfft, int n) {
     int i;
     // find max and pos max (px)
     double mx=-999; int px=0; for (i=0; i<n; i++) if (vfft[i]>mx) {mx=vfft[i]; px=i; }
@@ -419,8 +412,7 @@ double Jitter(double *vfft, int n)
 //
 // Find min note (weak note) in HzFrm as min(frm 0..max..0)
 //
-double weakNote(double *musGrid, int n)
-{ 
+double weakNote(double *musGrid, int n) { 
     int i, lm, rm;
     double mn=1e55;
     // find max and pos max (px)
@@ -433,8 +425,8 @@ double weakNote(double *musGrid, int n)
     for(i=lm; i<rm; i++) if (musGrid[i]<mn) mn=musGrid[i];
     return mn;
 }
-double excessNote(double *musGrid, int n)
-{
+
+double excessNote(double *musGrid, int n) {
     int i;
     // find max and pos max (px)
     double mx=-1e55; for (i=0; i<n; i++) if (musGrid[i]>mx) {mx=musGrid[i];}
@@ -444,26 +436,26 @@ double excessNote(double *musGrid, int n)
 //---------------------------------------------------------------------------
 // Comparision Sorting support
 //---------------------------------------------------------------------------
-int _cmp_int(const void *p1, const void *p2)
-{ 	return *(int*)p1 - *(int*)p2; }
-int _cmp_dbl(const void *p1, const void *p2)
-{
+int _cmp_int(const void *p1, const void *p2) { 	return *(int*)p1 - *(int*)p2; }
+
+int _cmp_dbl(const void *p1, const void *p2) {
     if ( *(double*)p1 > *(double*)p2 )      return +1;
     else if ( *(double*)p1 < *(double*)p2 ) return -1;
     else 												 return  0;
 }
-int _cmp_flt(const void *p1, const void *p2)
-{
+
+int _cmp_flt(const void *p1, const void *p2) {
     if ( *(float*)p1 > *(float*)p2 )      return +1;
     else if ( *(float*)p1 < *(float*)p2 ) return -1;
     else 									   	  return  0;
 }
 
-void MinMax(double*v, int n, double *Min, double *Max)
-{
+void MinMax(double*v, int n, double *Min, double *Max) {
     int i;
-    double mi=*v,mx=*v;
+    double mi=v[0],mx=v[0];
+    printf("MinMax 111\n");
     if (n==0) { *Min=*Max=0; return; }
+    printf("MinMax 222\n");
     for (i=0; i<n; i++) {
         if (v[i]>mx) mx=v[i];
         if (v[i]<mi) mi=v[i];
@@ -472,11 +464,10 @@ void MinMax(double*v, int n, double *Min, double *Max)
     *Max = mx;
 }
 
-void Sort(double*v, int n) { 	qsort(v, n, sizeof(double), _cmp_dbl); }
+void Sort(double*v, int n) { qsort(v, n, sizeof(double), _cmp_dbl); }
 
 // decibel calc
-double db1(double range, double val)
-{
+double db1(double range, double val) {
     if (val==0) return -80;
     return 20. * log10(val/range);
 }
@@ -487,8 +478,7 @@ double db2(double val) {
     return 20. * log10(val/32767.);
 }
 
-double db100(double val)
-{
+double db100(double val) {
     if (val==0) return -80;
     return 20. * log10(val/100.);
 }
