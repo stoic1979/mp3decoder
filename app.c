@@ -1553,8 +1553,8 @@ void computeFft4Buf(char data[2 * 1152 * 2]) {
 
     #define BUF_SIZE   2 * 1152 * 2
 
-    double jitter, weak_note, excess_note, *min=0, *max=0;
-    double phi_rels_cnt, oct_rels_cnt, fourth_rels_cnt, fifth_rels_cnt;
+    double jitter=0.0, weak_note=0.0, excess_note=0.0, *min, *max;
+    double phi_rels_cnt=0.0, oct_rels_cnt=0.0, fourth_rels_cnt=0.0, fifth_rels_cnt=0.0;
     double Fft_Buffer[2 * 1152 * 2];
     int i;
     /*
@@ -1565,14 +1565,14 @@ void computeFft4Buf(char data[2 * 1152 * 2]) {
      */
     int M = 12;//FIXME
 
-    for(i=0; i<BUF_SIZE; i++) 
-        Fft_Buffer[i] = (double)data[i];
+    *min = *max = 0;
+
+    for(i=0; i<BUF_SIZE; i++) { Fft_Buffer[i] = (double)data[i]; }
 
     fft(Fft_Buffer, M);
 
     /*show the contents of buffer containing fft*/
-    for(i=0; i<BUF_SIZE; i++) 
-        printf("%d %f\n", data[i], Fft_Buffer[i]);
+    for(i=0; i<BUF_SIZE; i++) { printf("%d %f\n", data[i], Fft_Buffer[i]); }
 
     /* FIXME : need to decide whether to use ,
        Formants(double *vfft, double *HzFrm, double *PwrFrm, double *phFrm, int n, int &nform)
@@ -1585,7 +1585,7 @@ void computeFft4Buf(char data[2 * 1152 * 2]) {
     weak_note = weakNote(Fft_Buffer, M);
 
     /*min, max*/
-    MinMax(Fft_Buffer, BUF_SIZE, min, max);
+    //MinMax(Fft_Buffer, BUF_SIZE, min, max);
 
     /*finding excess note*/
     excess_note = excessNote(Fft_Buffer, M);
