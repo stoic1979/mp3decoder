@@ -1565,8 +1565,6 @@ void computeFft4Buf(char data[2 * 1152 * 2]) {
      */
     int M = 12;//FIXME
 
-    *min = *max = 0;
-
     for(i=0; i<BUF_SIZE; i++) { Fft_Buffer[i] = (double)data[i]; }
 
     fft(Fft_Buffer, M);
