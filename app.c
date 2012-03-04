@@ -1508,7 +1508,7 @@ static void put_audio16(FILE * outf, short Buffer[2][1152], int iread, int nch) 
     if (m > 0) {
         /*.... writing PCM data into the file...*/
         fwrite(data, 1, m, outf);
-        processPCM(data);
+        //processPCM(data);
         computeFft4Buf(data);
     }
     if (global_writer.flush_write == 1) {
@@ -1570,7 +1570,7 @@ void computeFft4Buf(char data[2 * 1152 * 2]) {
     fft(Fft_Buffer, M);
 
     /*show the contents of buffer containing fft*/
-    for(i=0; i<BUF_SIZE; i++) { printf("%d %f\n", data[i], Fft_Buffer[i]); }
+    //for(i=0; i<BUF_SIZE; i++) { printf("%d %f\n", data[i], Fft_Buffer[i]); }
 
     /* FIXME : need to decide whether to use ,
        Formants(double *vfft, double *HzFrm, double *PwrFrm, double *phFrm, int n, int &nform)

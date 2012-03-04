@@ -12,7 +12,7 @@ LIBS="-L$PREFIX/lib -lmp3lame -DHAVE_MPGLIB"
 SOURCE="app.c utils.c fft.c process_fft.c"
 echo
 echo "Building MP3 Decoder..."
-echo "g++ -o app_lame $SOURCE $INCLUDE $LIBS"
+echo "gcc -o app_lame $SOURCE $INCLUDE $LIBS"
 gcc -o app_lame $SOURCE $INCLUDE $LIBS
 echo
 echo "Successfully Done !!!"
