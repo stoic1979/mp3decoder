@@ -11,16 +11,7 @@
  * WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  * 
  */
-#include "lame.h"
-
-#include <wchar.h>
-//#include <mbstring.h>
-
-#include "app_defs.h"
-#include "app_utils.h"
 #include "app.h"
-#include "app_fft.h"
-
 //STATIC DATA ------------------------------------------------------------------------------------
 static get_audio_global_data global;
 
@@ -1839,9 +1830,10 @@ static int lame_decode_fromfile(FILE * fd, short pcm_l[], short pcm_r[], mp3data
 
 /*********************************************************************************
 *
-*    MAIN 
+*    MAIN FOR STANDALONE APP
 *
 **********************************************************************************/
+#ifdef STANDALONE_APPLICATION
 int main(int argc, char *argv[]) {
     lame_t  gf;
     int     ret=0;
@@ -1895,3 +1887,59 @@ int main(int argc, char *argv[]) {
     printf("Decoding finished !!!\n\n");
     return ret;
 }
+#else
+/*********************************************************************************
+*
+*    MAIN FOR DECODER LIB
+*
+**********************************************************************************/
+int decoder_lib_main(char *src, char* des) {
+    lame_t  gf;
+    int     ret=0;
+    char    inPath[PATH_MAX + 1];
+    char    outPath[PATH_MAX + 1];
+    FILE   *outf;
+
+    gf = lame_init(); /* initialize libmp3lame */
+    if (!gf) {
+        printf("[ERROR] :: failed to initialize lame\n");
+        return -1;
+    }
+
+    printf("[INFO] :: Initialized Lame...\n");
+
+
+    /*set input format to mp3*/
+    global_reader.input_format = sf_mp3;
+
+    outf = init_files(gf, src, des);
+    if (outf == NULL) { return -1; }
+
+    /* turn off automatic writing of ID3 tag data into mp3 stream 
+     * we have to call it before 'lame_init_params', because that
+     * function would spit out ID3v2 tag data.
+     */
+    lame_set_write_id3tag_automatic(gf, 0);
+
+    /* Now that all the options are set, lame needs to analyze them and
+     * set some more internal options and check for problems
+     */
+    ret = lame_init_params(gf);
+    if (ret < 0) {
+        printf("[ERROR]:: fatal error during initialization\n");
+        return ret;
+    }
+
+    if (global_ui_config.silent > 0) {
+        global_ui_config.brhist = 0; /* turn off VBR histogram */
+    }
+
+    /*decode an mp3 to wav*/
+    ret = lame_decoder(gf, outf, inPath, outPath);
+
+    /*cleanup*/
+    lame_close(gf);
+    printf("Decoding finished !!!\n\n");
+    return ret;
+}
+#endif

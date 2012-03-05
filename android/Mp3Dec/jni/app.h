@@ -14,6 +14,16 @@
 #ifndef __APP_H__
 #define __APP_H__
 
+#include "lame.h"
+
+#include <wchar.h>
+//#include <mbstring.h>
+
+#include "app_defs.h"
+#include "app_utils.h"
+#include "app.h"
+#include "app_fft.h"
+
 //PROTOTYPES -------------------------------------------------------------------------------------
 static int     lame_decode_fromfile(FILE * fd, short pcm_l[], short pcm_r[], mp3data_struct * mp3data);
 static void    close_infile(void);
@@ -59,4 +69,7 @@ static unsigned long calcEndPadding(unsigned long samples, int pcm_samples_per_f
 void processPCM(char data[2 * 1152 * 2]);
 void computeFft4Buf(char data[2 * 1152 * 2]);
 
+#ifndef STANDALONE_APPLICATION
+int decoder_lib_main(char *src, char* des);
+#endif
 #endif//__APP_H__

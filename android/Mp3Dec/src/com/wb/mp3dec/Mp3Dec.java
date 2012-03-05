@@ -21,10 +21,12 @@ public class Mp3Dec extends Activity
             //setContentView(R.layout.main);
             TextView  tv = new TextView(this);
             tv.setText(Version());
+            Decode("res/breaking-voices.mp3", "res/breaking-voices.wav");
             setContentView(tv);
         }
 
     public native String  Version();
+    public native void    Decode(String srcpath, String despath);
 
     static {
         System.loadLibrary("wblame");
