@@ -7,7 +7,32 @@
 <TextView  
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
-    android:text="Hello World, Mp3Dec"
+    android:text="Select Mp3 File For Analysis"
     />
+<TextView 
+    android:layout_marginTop = "20dp"
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:text="Input Mp3 File Path:"
+    />
+<EditText android:id="@+id/etMp3Path"
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    />
+<TextView 
+    android:layout_marginTop = "20dp"
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:text="Output WAV File Path:"
+    />
+<EditText android:id="@+id/etWavPath"
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    />
+<Button android:id="@+id/btnDecode"
+    android:layout_marginTop = "20dp"
+    android:layout_width="wrap_content" 
+    android:layout_height="wrap_content" 
+    android:text="Decode" />
 </LinearLayout>
 
