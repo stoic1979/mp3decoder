@@ -4,12 +4,25 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
+<TextView 
+    android:id="@+id/tvAbout"
+    android:layout_marginLeft = "5dp"
+    android:layout_marginRight = "5dp"
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:text=""
+    />
 <TextView  
+    android:layout_marginTop = "20dp"
+    android:layout_marginLeft = "5dp"
+    android:layout_marginRight = "5dp"
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
     android:text="Select Mp3 File For Analysis"
     />
 <TextView 
+    android:layout_marginLeft = "5dp"
+    android:layout_marginRight = "5dp"
     android:layout_marginTop = "20dp"
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
@@ -18,21 +31,31 @@
 <EditText android:id="@+id/etMp3Path"
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
+    android:text="/sdcard/download/b1.mp3"
+    android:layout_marginLeft = "5dp"
+    android:layout_marginRight = "5dp"
     />
 <TextView 
     android:layout_marginTop = "20dp"
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
     android:text="Output WAV File Path:"
+    android:layout_marginLeft = "5dp"
+    android:layout_marginRight = "5dp"
     />
 <EditText android:id="@+id/etWavPath"
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
+    android:text="/sdcard/download/b1.wav"
+    android:layout_marginLeft = "5dp"
+    android:layout_marginRight = "5dp"
     />
 <Button android:id="@+id/btnDecode"
     android:layout_marginTop = "20dp"
     android:layout_width="wrap_content" 
     android:layout_height="wrap_content" 
+    android:layout_marginLeft = "5dp"
+    android:layout_marginRight = "5dp"
     android:text="Decode" />
 </LinearLayout>
 

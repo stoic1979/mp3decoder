@@ -11,7 +11,11 @@
  * WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  * 
  */
+#include <android/log.h>
 #include "app.h"
+
+#define MP3DEC_APP_TAG    "[MP3DEC-APP-JNI]"
+
 //STATIC DATA ------------------------------------------------------------------------------------
 static get_audio_global_data global;
 
@@ -674,6 +678,7 @@ static FILE * open_mpeg_file(lame_t gfp, char const *inPath, int *enc_delay, int
     /* set the defaults from info incase we cannot determine them from file */
     lame_set_num_samples(gfp, MAX_U_32_NUM);
 
+    __android_log_write(ANDROID_LOG_INFO, MP3DEC_APP_TAG, "**** open_mpeg_file ****\n");
     if (strcmp(inPath, "-") == 0) {
         musicin = stdin;
         lame_set_stream_binary_mode(musicin); /* Read from standard input. */
@@ -682,7 +687,7 @@ static FILE * open_mpeg_file(lame_t gfp, char const *inPath, int *enc_delay, int
         musicin = lame_fopen(inPath, "rb");
         if (musicin == NULL) {
             if (global_ui_config.silent < 10) {
-                printf("[ERROR] :: Could not find \"%s\".\n", inPath);
+                __android_log_write(ANDROID_LOG_INFO, MP3DEC_APP_TAG, "**** [ERROR] :: Could not open input file ****\n");
             }
             return 0;
         }
@@ -690,7 +695,7 @@ static FILE * open_mpeg_file(lame_t gfp, char const *inPath, int *enc_delay, int
 #ifdef AMIGA_MPEGA
     if (-1 == lame_decode_initfile(inPath, &global_decoder.mp3input_data)) {
         if (global_ui_config.silent < 10) {
-            printf("Error reading headers in mp3 input file %s.\n", inPath);
+            __android_log_write(ANDROID_LOG_INFO, MP3DEC_APP_TAG, " **** [ERROR] reading headers in mp3 input file ****\n");
         }
         close_input_file(musicin);
         return 0;
@@ -699,9 +704,10 @@ static FILE * open_mpeg_file(lame_t gfp, char const *inPath, int *enc_delay, int
 #ifdef HAVE_MPGLIB
     printf("-- HAVE_MPGLIB --\n");
 
+    __android_log_write(ANDROID_LOG_INFO, MP3DEC_APP_TAG, "**** HAVE_MPGLIB ****\n");
     if (-1 == lame_decode_initfile(musicin, &global_decoder.mp3input_data, enc_delay, enc_padding)) {
         if (global_ui_config.silent < 10) {
-            printf("Error reading headers in mp3 input file %s.\n", inPath);
+            __android_log_write(ANDROID_LOG_INFO, MP3DEC_APP_TAG, " **** [ERROR] reading headers in mp3 input file ****\n");
         }
         close_input_file(musicin);
         return 0;
@@ -709,6 +715,7 @@ static FILE * open_mpeg_file(lame_t gfp, char const *inPath, int *enc_delay, int
 #endif
     if (-1 == lame_set_num_channels(gfp, global_decoder.mp3input_data.stereo)) {
         if (global_ui_config.silent < 10) {
+            __android_log_write(ANDROID_LOG_INFO, MP3DEC_APP_TAG, " **** Unsupported number of channels\n");
             printf("Unsupported number of channels: %ud\n",
                          global_decoder.mp3input_data.stereo);
         }
@@ -738,6 +745,7 @@ static FILE * open_mpeg_file(lame_t gfp, char const *inPath, int *enc_delay, int
             }
         }
     }
+    __android_log_write(ANDROID_LOG_INFO, MP3DEC_APP_TAG, " **** succesfully returning musicin ****\n");
     return musicin;
 }
 
@@ -828,15 +836,18 @@ int init_infile(lame_t gfp, char const *inPath) {
     global. in_id3v2_tag = 0;
 
     if (is_mpeg_file_format(global_reader.input_format)) {
+        __android_log_write(ANDROID_LOG_INFO, MP3DEC_APP_TAG, " ++ init_infile 1 ++\n");
         global. music_in = open_mpeg_file(gfp, inPath, &enc_delay, &enc_padding);
     }
     else {
 #ifdef LIBSNDFILE
         if (strcmp(inPath, "-") != 0) { /* not for stdin */
+            __android_log_write(ANDROID_LOG_INFO, MP3DEC_APP_TAG, " ++ init_infile 2 ++\n");
             global. snd_file = open_snd_file(gfp, inPath);
         }
 #endif
         if (global.snd_file == 0) {
+            __android_log_write(ANDROID_LOG_INFO, MP3DEC_APP_TAG, " ++ init_infile 3 ++\n");
             global. music_in = open_wave_file(gfp, inPath);
         }
     }
@@ -848,6 +859,7 @@ int init_infile(lame_t gfp, char const *inPath) {
         if (n != MAX_U_32_NUM) {
             unsigned long const discard = global.pcm32.skip_start + global.pcm32.skip_end;
             lame_set_num_samples(gfp, n > discard ? n - discard : 0);
+            __android_log_write(ANDROID_LOG_INFO, MP3DEC_APP_TAG, " ++ init_infile 4 ++\n");
         }
     }
     return (global.snd_file != NULL || global.music_in != NULL) ? 1 : -1;
@@ -892,8 +904,12 @@ static FILE* init_files(lame_global_flags * gf, char const *inPath, char const *
        This test is very easy and buggy and don't recognize different names
        assigning the same file
      */
+    __android_log_write(ANDROID_LOG_INFO, MP3DEC_APP_TAG, " ---- init_files ---- \n");
+    __android_log_write(ANDROID_LOG_INFO, MP3DEC_APP_TAG, inPath);
+    __android_log_write(ANDROID_LOG_INFO, MP3DEC_APP_TAG, outPath);
+
     if (0 != strcmp("-", outPath) && 0 == strcmp(inPath, outPath)) {
-        printf("[ERROR] :: Input file and Output file are the same. Abort.\n");
+        __android_log_write(ANDROID_LOG_INFO, MP3DEC_APP_TAG, "[ERROR] :: Input file and Output file are the same. Abort.\n");
         return NULL;
     }
 
@@ -905,11 +921,11 @@ static FILE* init_files(lame_global_flags * gf, char const *inPath, char const *
      */
     //----------------------------------------------//
     if (init_infile(gf, inPath) < 0) {
-        printf("[ERROR] :: Can't init infile '%s'\n", inPath);
+        __android_log_write(ANDROID_LOG_INFO, MP3DEC_APP_TAG, "[ERROR] :: Can't init infile \n");
         return NULL;
     }
     if ((outf = init_outfile(outPath, lame_get_decode_only(gf))) == NULL) {
-        printf("[ERROR] :: Can't init outfile '%s'\n", outPath);
+        __android_log_write(ANDROID_LOG_INFO, MP3DEC_APP_TAG, "[ERROR] :: Can't init outfile \n");
         return NULL;
     }
 
@@ -1500,7 +1516,7 @@ static void put_audio16(FILE * outf, short Buffer[2][1152], int iread, int nch) 
         /*.... writing PCM data into the file...*/
         fwrite(data, 1, m, outf);
         //processPCM(data);
-        computeFft4Buf(data);
+        //computeFft4Buf(data);
     }
     if (global_writer.flush_write == 1) {
         fflush(outf);
@@ -1902,18 +1918,25 @@ int decoder_lib_main(char *src, char* des) {
 
     gf = lame_init(); /* initialize libmp3lame */
     if (!gf) {
-        printf("[ERROR] :: failed to initialize lame\n");
+        __android_log_write(ANDROID_LOG_INFO, MP3DEC_APP_TAG, " [ERROR] :: failed to initialize lame\n");
         return -1;
     }
 
-    printf("[INFO] :: Initialized Lame...\n");
+    __android_log_write(ANDROID_LOG_INFO, MP3DEC_APP_TAG, " [INFO] :: Initialized Lame...\n");
 
 
     /*set input format to mp3*/
     global_reader.input_format = sf_mp3;
 
+    __android_log_write(ANDROID_LOG_INFO, MP3DEC_APP_TAG, " -- decodibng files --\n");
+    __android_log_write(ANDROID_LOG_INFO, MP3DEC_APP_TAG, src);
+    __android_log_write(ANDROID_LOG_INFO, MP3DEC_APP_TAG, des);
+
     outf = init_files(gf, src, des);
-    if (outf == NULL) { return -1; }
+    if (outf == NULL) { 
+        __android_log_write(ANDROID_LOG_INFO, MP3DEC_APP_TAG, " [ERROR] :: init_files() failed\n");
+        return -1;
+    }
 
     /* turn off automatic writing of ID3 tag data into mp3 stream 
      * we have to call it before 'lame_init_params', because that
