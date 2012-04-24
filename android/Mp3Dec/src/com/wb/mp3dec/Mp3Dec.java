@@ -28,12 +28,14 @@ import android.content.Context;
 
 public class Mp3Dec extends Activity  implements OnClickListener {
 
-    private EditText etMp3Path;
-    private EditText etWavPath;
-    private Button   btnDecode;
-    private TextView tvAbout;
+    private EditText      etMp3Path;
+    private EditText      etWavPath;
+    private Button        btnDecode;
+    private TextView      tvAbout;
+    private String        abspath = "";
+    private EditText      etLogs;
+
     private static final String TAG = "[Mp3DecMAIN]";
-    private String abspath = "";
 
     /** Called when the activity is first created. */
     @Override
@@ -42,7 +44,6 @@ public class Mp3Dec extends Activity  implements OnClickListener {
             setContentView(R.layout.main);
             File file = Environment.getExternalStorageDirectory();
             Log.v(TAG, "data dir: " + file.getAbsolutePath());
-            //Decode("res/breaking-voices.mp3", "res/breaking-voices.wav");
 
             etMp3Path = (EditText) findViewById(R.id.etMp3Path);
             etWavPath = (EditText) findViewById(R.id.etWavPath);
@@ -61,16 +62,21 @@ public class Mp3Dec extends Activity  implements OnClickListener {
                 Log.v(TAG, "file " + (i+1) + " :" + fdir[i]);
             }
             abspath = this. getFilesDir(). getAbsolutePath();
-            copyFile();
+
+            etLogs = (EditText) findViewById(R.id.etLogs);
         }
 
-    public native String  Version();
-    public native void    Decode(String srcpath, String despath);
-
-    static {
-        System.loadLibrary("wblame");
+    private void addLog(String msg) {
+        String msgs = etLogs.getText().toString() + msg + "\n";
+        etLogs.setText(msgs);
     }
 
+    private void clearLogs() { etLogs.setText(""); }
+
+    /******************************************************************
+        test funciton to copy file into sdcard of emulator;
+        funciton is not needed in the release for actual device
+     *****************************************************************/
     private boolean copyFile() {
         Log.v(TAG, "ABS Path:  " + abspath);
         File file = new File(abspath + "/beep1.mp3");
@@ -92,6 +98,21 @@ public class Mp3Dec extends Activity  implements OnClickListener {
         return false;
     }
 
+    void gotSoundAnalysisResults(int error, double jitter, double weakNote, double excessNote, 
+            double phiRelsCnt, double octRelsCnt, double fourthRelsCnt, double fifthRelsCnt) {
+        if(error == 0) {
+            addLog("---- Sound Analysis Results ----");
+            addLog(" Jitter       : " + jitter);
+            addLog(" Weak Note    : " + weakNote);
+            addLog(" Excess Note  : " + excessNote);
+            addLog(" Phi Rels     : " + phiRelsCnt);
+            addLog(" Oct Rels     : " + octRelsCnt);
+            addLog(" Fourth Rels  : " + fourthRelsCnt);
+            addLog(" Fifth Rels   : " + fifthRelsCnt);
+        }
+        else addLog("error processing audio");
+    }
+
     @Override
         public void onClick(View v) {
             switch (v.getId()) {
@@ -100,11 +121,23 @@ public class Mp3Dec extends Activity  implements OnClickListener {
                     String wavpath = etWavPath. getText(). toString();
                     Log.v(TAG, "Decoding : " + mp3path + " --> " + wavpath); //+ file.getAbsolutePath());
                     String[] params = new String[] { mp3path, wavpath };
+
                     new AsyncDecode().execute(params);
                     break;
             }
 
         }
+
+    //*************************************** NATIVE PROTOTYPES *********************************************//
+    public native String  Version();
+    public native void    Decode(String srcpath, String despath);
+    //public native void     GetResponse(response r);
+
+    static {
+        System.loadLibrary("wblame");
+    }
+
+    //**************************************** INNER CLASSES ************************************************//
     private class AsyncDecode extends AsyncTask<String, Void, Void> {
         private ProgressDialog  dlgProgress;
         private File            mp3path;

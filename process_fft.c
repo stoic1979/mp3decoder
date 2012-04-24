@@ -1,6 +1,7 @@
 #include <math.h>
 #include <float.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <memory.h>
 #include "fft.h"
 

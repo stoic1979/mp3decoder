@@ -24,6 +24,10 @@
 //STATIC DATA ------------------------------------------------------------------------------------
 static get_audio_global_data global;
 
+/*average*/
+double avg_jitter=0.0, avg_weak_note=0.0, avg_excess_note=0.0;
+double avg_phi_rels_cnt=0.0, avg_oct_rels_cnt=0.0, avg_fourth_rels_cnt=0.0, avg_fifth_rels_cnt=0.0;
+
 /* AIFF Definitions */
 static int const IFF_ID_FORM = 0x464f524d; /* "FORM" */
 static int const IFF_ID_AIFF = 0x41494646; /* "AIFF" */
@@ -1578,32 +1582,39 @@ void computeFft4Buf(char data[2 * 1152 * 2]) {
 
     /*finding out jitter*/
     jitter = Jitter(Fft_Buffer, M);
+    avg_jitter = (avg_jitter + jitter)/2;
 
     /*finding weak note*/
     weak_note = weakNote(Fft_Buffer, M);
+    avg_weak_note = (avg_weak_note + weak_note)/2;
 
     /*min, max*/
     //MinMax(Fft_Buffer, BUF_SIZE, min, max);
 
     /*finding excess note*/
     excess_note = excessNote(Fft_Buffer, M);
+    avg_excess_note = (avg_excess_note + excess_note)/2;
 
     /*finding Phi Rels Cnt*/
     phi_rels_cnt = CountPhiRels(Fft_Buffer, M);
+    avg_phi_rels_cnt = (avg_phi_rels_cnt + phi_rels_cnt)/2;
 
     /*finding Oct Rels Cnt*/
     oct_rels_cnt = CountOctRels(Fft_Buffer, M);
+    avg_oct_rels_cnt = (avg_oct_rels_cnt + oct_rels_cnt)/2;
 
     /*finding Fourth Rels Cnt*/
     fourth_rels_cnt = CountFourthRels(Fft_Buffer, M);
+    avg_fourth_rels_cnt = (avg_fourth_rels_cnt + fourth_rels_cnt)/2;
 
     /*finding Fifth Rels Cnt*/
     fifth_rels_cnt = CountFourthRels(Fft_Buffer, M);
+    avg_fifth_rels_cnt = (avg_fifth_rels_cnt + fifth_rels_cnt)/2;
 
     printf("------------------ Sound Analysis ----------------\n");
     printf("Jitter          : %f\n", jitter);
     printf("Weak Note       : %f\n", weak_note);
-    printf("Excess Note     : %f\n", weak_note);
+    printf("Excess Note     : %f\n", excess_note);
     printf("Phi Rels Cnt    : %f\n", phi_rels_cnt);
     printf("Oct Rels Cnt    : %f\n", oct_rels_cnt);
     //printf("Mix, Max        : %f, %f\n", *min, *max);
@@ -1892,6 +1903,15 @@ int main(int argc, char *argv[]) {
 
     /*cleanup*/
     lame_close(gf);
+    printf("------------------ Average Sound Analysis ----------------\n");
+    printf("Average Jitter          : %f\n", avg_jitter);
+    printf("Average Weak Note       : %f\n", avg_weak_note);
+    printf("Average Excess Note     : %f\n", avg_excess_note);
+    printf("Average Phi Rels Cnt    : %f\n", avg_phi_rels_cnt);
+    printf("Average Oct Rels Cnt    : %f\n", avg_oct_rels_cnt);
+    printf("Average Fourth Rels Cnt : %f\n", avg_fourth_rels_cnt);
+    printf("Average Fifth Rels Cnt  : %f\n", avg_fifth_rels_cnt);
+    printf("--------------------------------------------------\n");
     printf("Decoding finished !!!\n\n");
     return ret;
 }

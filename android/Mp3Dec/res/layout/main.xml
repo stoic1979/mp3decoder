@@ -57,5 +57,17 @@
     android:layout_marginLeft = "5dp"
     android:layout_marginRight = "5dp"
     android:text="Decode" />
+<EditText android:id="@+id/etLogs"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:singleLine="false"
+    android:layout_marginTop="10dip"
+    android:layout_marginLeft="10dip" android:layout_marginRight="10dip"
+    android:lines="8" 
+    android:minLines="6" 
+    android:gravity="top|left" 
+    android:maxLines="10" 
+    android:scrollbars="vertical" 
+/>
 </LinearLayout>
 
