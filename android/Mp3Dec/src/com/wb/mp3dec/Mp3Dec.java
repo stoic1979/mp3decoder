@@ -64,6 +64,7 @@ public class Mp3Dec extends Activity  implements OnClickListener {
             abspath = this. getFilesDir(). getAbsolutePath();
 
             etLogs = (EditText) findViewById(R.id.etLogs);
+            addLog("test app...");
         }
 
     private void addLog(String msg) {
@@ -98,6 +99,9 @@ public class Mp3Dec extends Activity  implements OnClickListener {
         return false;
     }
 
+    /******************************************************************
+       Callback from C code  
+     *****************************************************************/
     void gotSoundAnalysisResults(int error, double jitter, double weakNote, double excessNote, 
             double phiRelsCnt, double octRelsCnt, double fourthRelsCnt, double fifthRelsCnt) {
         if(error == 0) {
@@ -156,6 +160,9 @@ public class Mp3Dec extends Activity  implements OnClickListener {
 
         @Override
             protected Void doInBackground(String... params) {
+                addLog("decoding...");
+                return null;
+                /*
                 mp3path = new File(params[0]);
                 wavpath = new File(params[1]);
 
@@ -167,6 +174,7 @@ public class Mp3Dec extends Activity  implements OnClickListener {
                     Log.v(TAG, "AsyncDecode err: " + e);
                 }
                 return null;
+                 */
             }
 
         @Override
