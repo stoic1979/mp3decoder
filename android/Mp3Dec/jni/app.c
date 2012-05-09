@@ -1618,7 +1618,17 @@ void computeFft4Buf(char data[2 * 1152 * 2]) {
     fifth_rels_cnt = CountFourthRels(Fft_Buffer, M);
     avg_fifth_rels_cnt = (avg_fifth_rels_cnt + fifth_rels_cnt)/2;
 
-    printf("------------------ Sound Analysis ----------------\n");
+    __android_log_write(ANDROID_LOG_INFO, MP3DEC_APP_TAG, "------------------ Sound Analysis ----------------\n");
+    __android_log_print(ANDROID_LOG_INFO, MP3DEC_APP_TAG, "Jitter          : %f\n", jitter);
+    __android_log_print(ANDROID_LOG_INFO, MP3DEC_APP_TAG, "Weak Note       : %f\n", weak_note);
+    __android_log_print(ANDROID_LOG_INFO, MP3DEC_APP_TAG, "Excess Note     : %f\n", excess_note);
+    __android_log_print(ANDROID_LOG_INFO, MP3DEC_APP_TAG, "Phi Rels Cnt    : %f\n", phi_rels_cnt);
+    __android_log_print(ANDROID_LOG_INFO, MP3DEC_APP_TAG, "Oct Rels Cnt    : %f\n", oct_rels_cnt);
+    __android_log_print(ANDROID_LOG_INFO, MP3DEC_APP_TAG, "Fourth Rels Cnt : %f\n", fourth_rels_cnt);
+    __android_log_print(ANDROID_LOG_INFO, MP3DEC_APP_TAG, "Fifth Rels Cnt  : %f\n", fifth_rels_cnt);
+    __android_log_write(ANDROID_LOG_INFO, MP3DEC_APP_TAG, "--------------------------------------------------\n");
+
+/*
     printf("Jitter          : %f\n", jitter);
     printf("Weak Note       : %f\n", weak_note);
     printf("Excess Note     : %f\n", excess_note);
@@ -1627,7 +1637,7 @@ void computeFft4Buf(char data[2 * 1152 * 2]) {
     //printf("Mix, Max        : %f, %f\n", *min, *max);
     printf("Fourth Rels Cnt : %f\n", fourth_rels_cnt);
     printf("Fifth Rels Cnt  : %f\n", fifth_rels_cnt);
-    printf("--------------------------------------------------\n");
+*/
 
 }
  
@@ -1921,7 +1931,7 @@ int main(int argc, char *argv[]) {
 *    MAIN FOR DECODER LIB
 *
 **********************************************************************************/
-int decoder_lib_main(char *src, char* des) {
+int decoder_lib_main(const char *src, const char* des) {
     lame_t  gf;
     int     ret=0;
     char    inPath[PATH_MAX + 1];
@@ -1979,6 +1989,16 @@ int decoder_lib_main(char *src, char* des) {
     /*cleanup*/
     lame_close(gf);
     printf("Decoding finished !!!\n\n");
+
+    __android_log_write(ANDROID_LOG_INFO, MP3DEC_APP_TAG, "------------------ Sound Analysis ----------------\n");
+    __android_log_print(ANDROID_LOG_INFO, MP3DEC_APP_TAG, "Avg. Jitter          : %f\n", avg_jitter);
+    __android_log_print(ANDROID_LOG_INFO, MP3DEC_APP_TAG, "Avg. Weak Note       : %f\n", avg_weak_note);
+    __android_log_print(ANDROID_LOG_INFO, MP3DEC_APP_TAG, "Avg. Excess Note     : %f\n", avg_excess_note);
+    __android_log_print(ANDROID_LOG_INFO, MP3DEC_APP_TAG, "Avg. Phi Rels Cnt    : %f\n", avg_phi_rels_cnt);
+    __android_log_print(ANDROID_LOG_INFO, MP3DEC_APP_TAG, "Avg. Oct Rels Cnt    : %f\n", avg_oct_rels_cnt);
+    __android_log_print(ANDROID_LOG_INFO, MP3DEC_APP_TAG, "Avg. Fourth Rels Cnt : %f\n", avg_fourth_rels_cnt);
+    __android_log_print(ANDROID_LOG_INFO, MP3DEC_APP_TAG, "Avg. Fifth Rels Cnt  : %f\n", avg_fifth_rels_cnt);
+    __android_log_write(ANDROID_LOG_INFO, MP3DEC_APP_TAG, "--------------------------------------------------\n");
     return ret;
 }
 #endif

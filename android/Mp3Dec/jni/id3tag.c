@@ -35,6 +35,9 @@
 #include <config.h>
 #endif
 
+#include <string.h>
+#include <strings.h>
+
 #ifdef STDC_HEADERS
 # include <stddef.h>
 # include <stdlib.h>

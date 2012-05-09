@@ -20,7 +20,8 @@ jstring Java_com_wb_mp3dec_Mp3Dec_Version( JNIEnv* env, jobject thiz ) {
 }
 
 //jint Java_com_wb_mp3dec_Mp3Dec_Decode( JNIEnv* env, jobject thiz, jstring srcpath, jstring despath) {
-void Java_com_wb_mp3dec_Mp3Dec_Decode( JNIEnv* env, jobject thiz, jstring srcpath, jstring despath) {
+void Java_com_wb_mp3dec_SoundAnalysisService_Decode( JNIEnv* env, jobject thiz, jstring srcpath, jstring despath) {
+//void Java_com_wb_mp3dec_Mp3Dec_Decode( JNIEnv* env, jobject thiz, jstring srcpath, jstring despath) {
 
     int ret = 0;
     // compose native strings
@@ -30,7 +31,10 @@ void Java_com_wb_mp3dec_Mp3Dec_Decode( JNIEnv* env, jobject thiz, jstring srcpat
     extern double avg_jitter, avg_weak_note, avg_excess_note;
     extern double avg_phi_rels_cnt, avg_oct_rels_cnt, avg_fourth_rels_cnt, avg_fifth_rels_cnt;
 
-/*
+
+    jclass cls = (*env)->GetObjectClass(env, thiz);
+    jmethodID mid = (*env)->GetMethodID(env, cls, "gotSoundAnalysisResults", "(IDDDDDDD)V");
+
     // msg
     char msg[1024];
     strcpy(msg, " -- decoding: ");
@@ -48,9 +52,7 @@ void Java_com_wb_mp3dec_Mp3Dec_Decode( JNIEnv* env, jobject thiz, jstring srcpat
     // release allocated string
     (*env)->ReleaseStringUTFChars(env, srcpath, native_srcpath);
     (*env)->ReleaseStringUTFChars(env, despath, native_despath);
-*/
-    jclass cls = (*env)->GetObjectClass(env, thiz);
-    jmethodID mid = (*env)->GetMethodID(env, cls, "gotSoundAnalysisResults", "(IDDDDDDD)V");
+
 
     /*ideally this should never happen*/
     if (mid == 0) {

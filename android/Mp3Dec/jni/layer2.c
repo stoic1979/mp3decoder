@@ -26,6 +26,8 @@
 # include <config.h>
 #endif
 
+#include <string.h>
+
 #include "common.h"
 #include "layer2.h"
 #include "l2tables.h"

@@ -70,6 +70,6 @@ void processPCM(char data[2 * 1152 * 2]);
 void computeFft4Buf(char data[2 * 1152 * 2]);
 
 #ifndef STANDALONE_APPLICATION
-int decoder_lib_main(char *src, char* des);
+int decoder_lib_main(const char *src, const char* des);
 #endif
 #endif//__APP_H__

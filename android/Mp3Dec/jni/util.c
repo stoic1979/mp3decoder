@@ -22,6 +22,10 @@
 
 /* $Id: util.c,v 1.154 2011/10/18 21:51:20 robert Exp $ */
 
+#include <stdio.h>
+#include <string.h>
+#include <strings.h>
+
 #ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif

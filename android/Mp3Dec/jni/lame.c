@@ -30,6 +30,7 @@
 # include <config.h>
 #endif
 
+#include <stdlib.h>
 
 #include "lame.h"
 #include "machine.h"
